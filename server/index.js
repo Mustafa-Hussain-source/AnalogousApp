@@ -3,7 +3,7 @@ import http from "http";
 import { app } from "./app.js";
 import { config } from "dotenv";
 import mongoose from "mongoose";
-import protectedRoutes from "./routes/protectedRoutes.js";
+// import protectedRoutes from "./routes/protectedRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 
 config({
@@ -11,7 +11,7 @@ config({
 });
 
 
-app.use("/api", protectedRoutes);
+// app.use("/api", protectedRoutes);
 app.use("/api/auth", authRoutes);
 
 const server = http.createServer(app);
