@@ -16,7 +16,10 @@ export const register = async (req, res) => {
     await user.save();
 
     const token = jwt.sign(
-      { id: user._id, email: user.email }, 
+      { id: user._id, 
+        email: user.email,
+        role: user.role 
+      }, 
       process.env.JWT_SECRET, 
       { expiresIn: "24h" }
     );
@@ -45,8 +48,17 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    if (user.status === "disabled") {
+      return res.status(403).json({
+      message: "Account is disabled. Contact Admin."
+      });
+    }
+
     const token = jwt.sign(
-      { id: user._id, email: user.email }, 
+      { id: user._id, 
+        email: user.email,
+        role: user.role
+      }, 
       process.env.JWT_SECRET, 
       { expiresIn: "24h" }
     );
@@ -105,6 +117,34 @@ export const deleteAccount = async (req, res) => {
     await User.findByIdAndDelete(userId);
 
     res.json({ message: "Account deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+
+    const users = await User.find().select("-password");
+
+    res.json(users);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const disableUser = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    await User.findByIdAndUpdate(id, {
+      status: "disabled"
+    });
+
+    res.json({ message: "User Disabled" });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
