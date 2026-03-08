@@ -86,6 +86,27 @@
   margin: 0;
 }
 
+.mini-graph {
+  margin: 0.75rem auto 0.25rem;
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mini-bar {
+  width: 14px;
+  border-radius: 4px 4px 0 0;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.graph-label {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .dashboard-container {

@@ -8,6 +8,12 @@ function Dashboard() {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
 
+  const dummyLoginData = [2, 4, 3, 6, 5, 7, 4];
+  const totalLogins = dummyLoginData.reduce((sum, n) => sum + n, 0);
+
+  const dummyAnomalousData = [0, 1, 0, 2, 0, 1, 0];
+  const totalAnomalous = dummyAnomalousData.reduce((sum, n) => sum + n, 0);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -65,11 +71,32 @@ function Dashboard() {
         <div className="stats-grid">
           <div className="stat-card">
             <h3>Total Logins</h3>
-            <p className="stat-value">0</p>
+            <p className="stat-value">{totalLogins}</p>
+            <div className="mini-graph" aria-label="Weekly login activity">
+              {dummyLoginData.map((count, index) => (
+                <div 
+                  key={index}
+                  className="mini-bar"
+                  style={{ height: `${count * 10}px` }}
+                  title={`Day ${index + 1}: ${count}`}
+                />
+              ))}
+            </div>
+            <p className="graph-label">Last 7 days (dummy) </p>
           </div>
           <div className="stat-card">
             <h3> Anamolous Logins </h3>
-            <p className="stat-value">0</p>
+            <p className="stat-value">{totalAnomalous}</p>
+            <div className="mini-graph" aria-label="Weekly anomalous login activity">
+              {dummyAnomalousData.map((count, index) => (
+                <div 
+                  key={index}
+                  className="mini-bar"
+                  style={{ height: `${count * 20}px` }}
+                  title={`Day ${index + 1}: ${count} anomalous`}
+                />
+              ))}
+            </div>
           </div>
           <div className="stat-card">
             <h3> Last Login </h3>
