@@ -47,8 +47,8 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-card">
-        <h1>Welcome 👋</h1>
+      <div className="dashboard-section">
+        <h2>Welcome 👋</h2>
 
         {user && (
           <>
@@ -58,10 +58,28 @@ function Dashboard() {
         )}
 
         <p className="message">{message}</p>
-
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
+      </div>
+      
+      <div className="statistics-section">
+        <h2> Account Statistics </h2>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Logins</h3>
+            <p className="stat-value">0</p>
+          </div>
+          <div className="stat-card">
+            <h3> Anamolous Logins </h3>
+            <p className="stat-value">0</p>
+          </div>
+          <div className="stat-card">
+            <h3> Last Login </h3>
+            <p className="stat-value" >N/A </p>
+          </div>
+          <div className="stat-card">
+            <h3> Account Status </h3>
+            <p className="stat-value">Active</p>
+          </div>
+        </div>
       </div>
     </div>
   );
