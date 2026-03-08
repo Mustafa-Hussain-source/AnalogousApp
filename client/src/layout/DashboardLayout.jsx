@@ -13,7 +13,7 @@ function DashboardLayout() {
   return (
     <div className="layout-container">
       <aside className="sidebar">
-        <h2 className="logo">MyApp</h2>
+        <h2 className="logo">Anomalous Login Detection System</h2>
 
         <nav>
           <NavLink
