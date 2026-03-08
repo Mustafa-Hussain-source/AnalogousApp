@@ -14,6 +14,15 @@ function Dashboard() {
   const dummyAnomalousData = [0, 1, 0, 2, 0, 1, 0];
   const totalAnomalous = dummyAnomalousData.reduce((sum, n) => sum + n, 0);
 
+  const dummyLastLogin = "2026-03-08T21:42:00.000Z";
+  const formattedLastLogin = new Date(dummyLastLogin).toLocaleString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -100,7 +109,7 @@ function Dashboard() {
           </div>
           <div className="stat-card">
             <h3> Last Login </h3>
-            <p className="stat-value" >N/A </p>
+            <p className="stat-value" >{formattedLastLogin}</p>
           </div>
           <div className="stat-card">
             <h3> Account Status </h3>
