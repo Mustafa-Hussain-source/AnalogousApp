@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import LoginLog from "../models/loginLog.js";
 
 export const register = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({ 
       token, 
-      user: { id: user._id, email: user.email, username: user.username },
+      user: { id: user._id, email: user.email, username: user.username, role: user.role },
       message: "User registered successfully" 
     });
   } catch (error) {
@@ -45,6 +46,22 @@ export const login = async (req, res) => {
 
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
+      user.failedAttempts = (user.failedAttempts || 0) + 1;
+      if (user.failedAttempts >= 5) {
+        user.status = "disabled";
+      }
+      await user.save();
+      await LoginLog.create({
+        email: email,
+        ip: req.ip,
+        device: req.headers["user-agent"],
+        status: "failed"
+      });
+      if (user.failedAttempts >= 5) {
+        return res.status(403).json({
+          message: "Account locked after multiple failed login attempts. Contact admin."
+        });
+      }
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
@@ -53,6 +70,29 @@ export const login = async (req, res) => {
       message: "Account is disabled. Contact Admin."
       });
     }
+    user.failedAttempts = 0;
+    user.ip = req.ip;
+    user.lastLogin = new Date();
+    user.device = req.headers["user-agent"];
+    let location = "Unknown";
+
+    try {
+      const geo = await fetch(`http://ip-api.com/json/${req.ip}`);
+      const geoData = await geo.json();
+      location = `${geoData.city}, ${geoData.country}`;
+    } catch (error) {
+      console.log("Location lookup failed");
+    }
+
+    await user.save();
+    await LoginLog.create({
+      userId: user._id,
+      email: user.email,
+      ip: user.ip,
+      device: user.device,
+      location: user.location,
+      status: "success"
+    });
 
     const token = jwt.sign(
       { id: user._id, 
@@ -65,7 +105,7 @@ export const login = async (req, res) => {
 
     res.json({ 
       token, 
-      user: { id: user._id, email: user.email, username: user.username },
+      user: { id: user._id, email: user.email, username: user.username, role: user.role, lastLogin: user.lastLogin},
       message: "Login successful" 
     });
   } catch (error) {
@@ -139,12 +179,44 @@ export const disableUser = async (req, res) => {
   try {
 
     const { id } = req.params;
-
-    await User.findByIdAndUpdate(id, {
-      status: "disabled"
+    if (req.user.id === id) {
+      return res.status(400).json({
+        message: "You cannot disable your own account."
+      });
+    }
+    const user = await User.findByIdAndUpdate(
+      id,
+      { status: "disabled" },
+      { new: true }
+    );
+    res.json({
+      message: "User disabled successfully",
+      user
     });
 
-    res.json({ message: "User Disabled" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const enableUser = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { 
+        status: "active",
+        failedAttempts: 0
+      },
+      { new: true }
+    );
+
+    res.json({
+      message: "User enabled successfully",
+      user
+    });
 
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -26,8 +26,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["active", "disabled"],
     default: "active"
+  },
+  failedAttempts: {
+    type: Number,
+    default: 0
+  },
+  lastLogin: {
+    type: Date
+  },
+  device: {
+    type: String
+  },
+  ip: {
+    type: String
+  },
+  location: {
+    type: String
   }
-
 
 }, { timestamps: true });
 
